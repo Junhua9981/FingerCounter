@@ -1,0 +1,2 @@
+mediapipe==0.8.7.2
+# numba 以後才可能用到
