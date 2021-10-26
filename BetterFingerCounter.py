@@ -9,21 +9,21 @@ import HandTrackingModule as htm
 __author__="Junhua"
 __updateDate__="2021/10/26"
 
-
-def rtList(lmList:list, angle:float):
+def rtList(lmList:list, angle:float, wrist: list):
     rotList=[]
+    wx=wrist[1]
+    wy=wrist[2]
     for lm in lmList:
-        new_v=rotate( (lm[1]-lmList[0][1],lm[2]-lmList[0][2]) , angle)
-        rotList.append((new_v[0]+lmList[0][1],new_v[1]+lmList[0][2]))
+        new_v=rotate( (float(lm[1]-wx),float(lm[2]-wy)) , angle)
+        rotList.append((new_v[0]+wx,new_v[1]+wy))
     return rotList
-
 
 def calcAngel(vect2:list):
     v1 = np.asarray((0,1))
     v2 = np.asarray(vect2)
     # print (v2)
     # 計算方向向量
-    unit_v1 = v1 / np.linalg.norm(v1)
+    unit_v1 = v1 # / np.linalg.norm(v1)
     unit_v2 = v2 / np.linalg.norm(v2)
     # 根據dot反推夾角
     dot_product = np.dot(unit_v1, unit_v2)
@@ -34,6 +34,7 @@ def calcAngel(vect2:list):
     # print(angle*180/pi)
     return angle
 
+@nb.njit
 def rotate(vect2: list, angle: float):
     v2 = np.asarray(vect2)
     rotate_matrix = np.asarray([[cos(angle),-sin(angle)],[sin(angle),cos(angle)]])
@@ -45,15 +46,15 @@ def rotate(vect2: list, angle: float):
 
 
 def fingerCounter():
-    wCam, hCam = 640, 480
-    # wCam, hCam =1280,720
+    # wCam, hCam = 640, 480
+    wCam, hCam =1280,720
     cap = cv2.VideoCapture(0)
     cap.set(3, wCam)
     cap.set(4, hCam)
 
     pTime = 0
 
-    detector = htm.handDetector(detectionCon=0.75)
+    detector = htm.handDetector(detectionCon=0.5)
 
     tipIds = [4, 8, 12, 16, 20]
     rotTipIds = [3, 7, 11, 15, 19]
@@ -74,7 +75,7 @@ def fingerCounter():
         if len(lmList) != 0:
 
             angle=calcAngel((lmList[0][1]-lmList[9][1],lmList[0][2]-lmList[9][2]))
-            rotList=rtList(lmList[1:],angle)
+            rotList=rtList(lmList[1:],angle, lmList[1])
 
             fingers = []
             flip=False
@@ -125,6 +126,7 @@ def fingerCounter():
                 # print(9)
             elif not fingers[0] and fingers[1] and not fingers[2] and not fingers[3] and fingers[4]:
                 twoDigit=True
+                # still in developing...
                 continue
             else:
                 totalFingers = fingers.count(1)
