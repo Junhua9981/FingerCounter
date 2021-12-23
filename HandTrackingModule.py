@@ -1,11 +1,6 @@
 
 # HandTrackingModule.py
-"""
-Hand Tracing Module
-By: Murtaza Hassan
-Youtube: http://www.youtube.com/c/MurtazasWorkshopRoboticsandAI
-Website: https://www.computervision.zone
-"""
+
 
 import cv2
 import mediapipe as mp

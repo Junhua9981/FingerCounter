@@ -41,7 +41,7 @@ def calcAngel(vect2:list):
     return angle
 
 # @nb.njit
-def rotate(vect2: list, angle: float):
+def rotate(vect2: list, angle: float): #旋轉矩陣 旋轉向量
     v2            = np.asarray(vect2)
     rotate_matrix = np.asarray([[cos(angle),-sin(angle)],[sin(angle),cos(angle)]])
     new_v2        = np.dot(rotate_matrix,v2) 
@@ -52,8 +52,13 @@ def rotate(vect2: list, angle: float):
 
 
 def fingerCounter():
+<<<<<<< HEAD
     # cap = cv2.VideoCapture(1)
     cap = cv2.VideoCapture(0) #default camera
+=======
+    cap = cv2.VideoCapture(1)
+    # cap = cv2.VideoCapture(0) #default camera
+>>>>>>> 1656e94568df2367a4f20e48296e9807d6eccdb3
     cap.set(3, wCam)
     cap.set(4, hCam)
 
@@ -62,7 +67,7 @@ def fingerCounter():
     detector = htm.handDetector(detectionCon=0.7, maxHands=1 , trackCon=0.7)
 
     # tipIds = [4, 8, 12, 16, 20]
-    rotTipIds = [3, 7, 11, 15, 19]
+    rotTipIds = [3, 7, 11, 15, 19] # 旋轉完後的指尖編號 和原本的相差第0號手腕的數據(因為轉前後不改變)
 
     prevHand    = 0
     prevCounter = 0
@@ -72,7 +77,7 @@ def fingerCounter():
     
     while True:
         success, img = cap.read()
-        img=cv2.flip(img,1)
+        img=cv2.flip(img,1) #左右反轉
         img = detector.findHands(img)
         imgCanvas = np.zeros((hCam, wCam, 3), np.uint8)
         imgCanvas.fill(255)
@@ -96,48 +101,36 @@ def fingerCounter():
             flip    = False 
 
             if checkHandSide=='Right':
-                # print('Right', end=' ')
-                if rotList[rotTipIds[0]][0]>rotList[rotTipIds[4]][0]:
-                    # print("0>4")
+                if rotList[4][0]>rotList[16][0]: # 食指根部 和 小指根部辨識正反手
                     flip = False
                 else: 
-                    # print("0<4")
                     flip = True
             else :
-                # print('Left', end=' ')
-                if rotList[rotTipIds[0]][0]<rotList[rotTipIds[4]][0]:
-                    # print("0<4")
+                if rotList[4][0]<rotList[16][0]:
                     flip = False
                 else: 
-                    # print("0>4")
                     flip = True
-
-            # if rotList[rotTipIds[0]][0]>rotList[rotTipIds[4]][0] and checkHandSide=='Right':
-            #     flip = True
-            # else :
-            #     flip = False
-
 
             # Thumb
             if checkHandSide=='Right':
                 if flip:
-                    if rotList[rotTipIds[0]][0] > rotList[rotTipIds[0] - 1][0]:
+                    if rotList[rotTipIds[0]][0] > rotList[rotTipIds[0] - 2][0]: # rotTipIds[0] - 2 in testing....
                         fingers.append(0)
                     else:
                         fingers.append(1)
                 else :
-                    if rotList[rotTipIds[0]][0] < rotList[rotTipIds[0] - 1][0]:
+                    if rotList[rotTipIds[0]][0] < rotList[rotTipIds[0] - 2][0]:
                         fingers.append(0)
                     else:
                         fingers.append(1)
             else :
                 if flip:
-                    if rotList[rotTipIds[0]][0] < rotList[rotTipIds[0] - 1][0]:
+                    if rotList[rotTipIds[0]][0] < rotList[rotTipIds[0] - 2][0]:
                         fingers.append(0)
                     else:
                         fingers.append(1)
                 else :
-                    if rotList[rotTipIds[0]][0] > rotList[rotTipIds[0] - 1][0]:
+                    if rotList[rotTipIds[0]][0] > rotList[rotTipIds[0] - 2][0]:
                         fingers.append(0)
                     else:
                         fingers.append(1)
@@ -170,10 +163,6 @@ def fingerCounter():
             elif     fingers[0] and     fingers[1] and     fingers[2] and     fingers[3] and not fingers[4]:
                 totalFingers=9
                 # print(9)
-            elif not fingers[0] and     fingers[1] and not fingers[2] and not fingers[3] and     fingers[4]:
-                twoDigit=True
-                # still in developing...
-                continue
             else:
                 totalFingers = fingers.count(1)
 
