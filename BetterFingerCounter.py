@@ -144,7 +144,7 @@ def fingerCounter():
 
             # display 拇指座標
             # cv2.putText(img, str(lmList[tipIds[0]][1:]), lmList[tipIds[0]][1:],cv2.FONT_HERSHEY_SIMPLEX,0.5, (0, 255, 255), 2)
-            cv2.putText(img, checkHandSide+" "+str(score), lmList[rotTipIds[0]][1:],cv2.FONT_HERSHEY_PLAIN,3, (0, 255, 255), 2)
+            # cv2.putText(img, checkHandSide+" "+str(score), lmList[rotTipIds[0]][1:],cv2.FONT_HERSHEY_PLAIN,3, (0, 255, 255), 2)
             
             # 4 Fingers
             for id in range(1, 5):
@@ -253,7 +253,7 @@ def fingerCounter():
         # cv2.imshow('res',img2_fg)
 
         # ref: https://blog.csdn.net/qq_41895190/article/details/82905657
-        cv2.imshow("Image", img)
+        cv2.imshow("Image", img1)
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
