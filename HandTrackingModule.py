@@ -1,18 +1,13 @@
 
 # HandTrackingModule.py
-"""
-Hand Tracing Module
-By: Murtaza Hassan
-Youtube: http://www.youtube.com/c/MurtazasWorkshopRoboticsandAI
-Website: https://www.computervision.zone
-"""
+
 
 import cv2
 import mediapipe as mp
 import time
 
 class handDetector():
-    def __init__(self, mode=False, maxHands=2, detectionCon=0.5, trackCon=0.5):
+    def __init__(self, mode=False, maxHands=1, detectionCon=0.5, trackCon=0.5):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -34,6 +29,19 @@ class handDetector():
                     self.mpDraw.draw_landmarks(img, handLms,
                                                self.mpHands.HAND_CONNECTIONS)
         return img
+    
+    def checkRightOrLeft(self, img):
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.results = self.hands.process(imgRGB)
+        label=''
+        score=0
+        if self.results.multi_hand_landmarks:
+            for classification in self.results.multi_handedness:
+                # Process results
+                label = classification.classification[0].label
+                score = classification.classification[0].score
+                # text = '{} {}'.format(label, round(score, 2))
+        return label,score
 
     def findPosition(self, img, handNo=0, draw=True):
 
