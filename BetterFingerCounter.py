@@ -52,8 +52,8 @@ def rotate(vect2: list, angle: float):
 
 
 def fingerCounter():
-    cap = cv2.VideoCapture(1)
-    # cap = cv2.VideoCapture(0) default camera
+    # cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0) #default camera
     cap.set(3, wCam)
     cap.set(4, hCam)
 
@@ -75,6 +75,7 @@ def fingerCounter():
         img=cv2.flip(img,1)
         img = detector.findHands(img)
         imgCanvas = np.zeros((hCam, wCam, 3), np.uint8)
+        imgCanvas.fill(255)
         lmList    = detector.findPosition(img, draw=False)
 
         checkHandSide=''
@@ -203,8 +204,6 @@ def fingerCounter():
         #             2, (255, 0, 0), 2)
 
 
-        cv2.imshow("Image", img)
-
         if len(rotList)!=0:
             # cv2.line(imgCanvas, (lmList[0][1],lmList[0][2]), rotList[0], (0, 0, 255), 5)
             cv2.line(imgCanvas, (wCam//2,  hCam//3*2), rotList[0], (0, 0, 255), 5)
@@ -230,8 +229,31 @@ def fingerCounter():
             cv2.line(imgCanvas, rotList[18], rotList[19], (0, 0, 255), 5)
             # cv2.line(imgCanvas, (lmList[0][1],lmList[0][2]), rotList[16], (0, 0, 255), 5)
             cv2.line(imgCanvas, (wCam//2, hCam//3*2), rotList[16], (0, 0, 255), 5)
-        cv2.imshow("Canvas", imgCanvas)
+        # cv2.imshow("Canvas", imgCanvas)
         
+        img1 = img
+        wh=(wCam//3, hCam//3)
+        imgCanvas=cv2.resize(imgCanvas, wh, interpolation=cv2.INTER_AREA)
+        img2=np.zeros((hCam, wCam, 3), np.uint8)
+        img2.fill(255) 
+        img2[0:wh[1], 0:wh[0]]=imgCanvas
+        rows,cols,channels = img2.shape
+        roi = img1[0:rows, 0:cols ]
+        
+        img2gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+        ret, mask = cv2.threshold(img2gray, 175, 255, cv2.THRESH_BINARY)
+        mask_inv = cv2.bitwise_not(mask)
+        
+        img1_bg = cv2.bitwise_and(roi,roi,mask = mask)
+        
+        img2_fg = cv2.bitwise_and(img2,img2,mask = mask_inv)
+        
+        dst = cv2.add(img1_bg,img2_fg)
+        img1[0:rows, 0:cols ] = dst
+        # cv2.imshow('res',img2_fg)
+
+        # imgCanvas.copyTo(img)
+        cv2.imshow("Image", img)
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
